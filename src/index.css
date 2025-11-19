@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* Override dark variant to use class selector instead of prefers-color-scheme */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Ensure body and html have dark background in dark mode */
+body {
+  @apply bg-gray-100 dark:bg-gray-900;
+}
+
+/* Prevent any focus styles or blue borders on SVG elements */
+svg g:focus,
+svg g:focus-visible,
+svg circle:focus,
+svg circle:focus-visible {
+  outline: none !important;
+  border: none !important;
+  stroke: none !important;
+}
+
+svg g[role="button"]:focus,
+svg g[role="button"]:focus-visible {
+  outline: none !important;
+}
+
+/* Animation for seat status changes */
+@keyframes seat-status-change {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.seat-circle {
+  transition: fill 0.3s ease, transform 0.2s ease;
+}
+
+.seat-circle.status-updated {
+  animation: seat-status-change 0.5s ease-in-out;
+}
