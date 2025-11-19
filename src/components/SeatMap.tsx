@@ -1,6 +1,7 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import type { Venue, SelectedSeat } from "../types";
 import { PRICE_TIERS } from "../types";
+import { MAX_SELECTED_SEATS } from "../constants";
 import Seat from "./Seat";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -383,7 +384,8 @@ export default function SeatMap({
         if (
           containerRef.current &&
           containerRef.current.contains(target) &&
-          (focusedSeat.status === "available" || focusedSeat.status === "held")
+          (focusedSeat.status === "available" || focusedSeat.status === "held") &&
+          selectedSeats.length < MAX_SELECTED_SEATS
         ) {
           e.preventDefault();
           e.stopPropagation();
@@ -391,7 +393,7 @@ export default function SeatMap({
         }
       }
     },
-    [findNextSeat, focusedSeat, onSeatSelect]
+    [findNextSeat, focusedSeat, onSeatSelect, selectedSeats.length]
   );
 
   // Set up keyboard event listener on container

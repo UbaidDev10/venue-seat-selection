@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "generate-seats": "node scripts/generate-seats.js",
     "delete-seats": "node scripts/delete-seats.js",
-    "ws-server": "node scripts/websocket-server.js"
+    "ws-server": "node scripts/websocket-server.js",
+    "ws-serve": "node scripts/websocket-server.js"
   },
   "dependencies": {
     "react": "^19.2.0",

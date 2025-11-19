@@ -1,10 +1,12 @@
 import type { SelectedSeat } from "../types";
 import { PRICE_TIERS } from "../types";
+import { MAX_SELECTED_SEATS } from "../constants";
 
 interface SeatDetailsProps {
   seat: SelectedSeat | null;
   onSelectSeat?: (seat: SelectedSeat) => void;
   isSelected?: boolean;
+  selectedSeatsCount?: number;
 }
 
 const STATUS_LABELS_MAP: Record<string, string> = {
@@ -18,6 +20,7 @@ export default function SeatDetails({
   seat,
   onSelectSeat,
   isSelected = false,
+  selectedSeatsCount = 0,
 }: SeatDetailsProps) {
   if (!seat) {
     return (
@@ -34,6 +37,8 @@ export default function SeatDetails({
 
   const price = PRICE_TIERS[seat.priceTier] ?? 50;
   const canSelect = seat.status === "available" || seat.status === "held";
+  const isMaxSeatsReached = selectedSeatsCount >= MAX_SELECTED_SEATS;
+  const canSelectThisSeat = canSelect && !isSelected && !isMaxSeatsReached;
 
   const statusColors: Record<string, string> = {
     available:
@@ -125,11 +130,20 @@ export default function SeatDetails({
 
       {canSelect && (
         <div className="mt-4 space-y-3">
-          <div className="p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
-            <p className="text-sm text-green-800 dark:text-green-300">
-              ✅ This seat is available for selection.
-            </p>
-          </div>
+          {isMaxSeatsReached && !isSelected && (
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <p className="text-sm text-amber-800 dark:text-amber-300">
+                ⚠️ Maximum seats selected ({MAX_SELECTED_SEATS}). Please remove a seat to select another one.
+              </p>
+            </div>
+          )}
+          {!isMaxSeatsReached && (
+            <div className="p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
+              <p className="text-sm text-green-800 dark:text-green-300">
+                ✅ This seat is available for selection.
+              </p>
+            </div>
+          )}
           <button
             onMouseDown={(e) => {
               // Prevent this from causing the seat to lose focus
@@ -138,20 +152,20 @@ export default function SeatDetails({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              if (!isSelected && onSelectSeat && seat) {
+              if (canSelectThisSeat && onSelectSeat && seat) {
                 // Select the seat and keep it focused
                 onSelectSeat(seat);
               }
             }}
             type="button"
             className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
-              isSelected || !onSelectSeat
+              !canSelectThisSeat || !onSelectSeat
                 ? "bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400 cursor-not-allowed opacity-60"
                 : "bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 active:bg-blue-800 dark:active:bg-blue-700 cursor-pointer"
             }`}
-            aria-disabled={isSelected || !onSelectSeat}
+            aria-disabled={!canSelectThisSeat || !onSelectSeat}
           >
-            {isSelected ? "✓ Seat Selected" : "Select This Seat"}
+            {isSelected ? "✓ Seat Selected" : isMaxSeatsReached ? `Maximum Seats Selected (${MAX_SELECTED_SEATS})` : "Select This Seat"}
           </button>
         </div>
       )}

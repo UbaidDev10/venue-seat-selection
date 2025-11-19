@@ -111,6 +111,7 @@ function App() {
                   ? selectedSeats.some((s) => s.id === focusedSeat.id)
                   : false
               }
+              selectedSeatsCount={selectedSeats.length}
             />
             <SelectionSummary
               selectedSeats={selectedSeats}
